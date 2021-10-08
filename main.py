@@ -38,7 +38,10 @@ class AuthenticationFailed(Exception):
 # print(bytes(salt_int).hex())
 
 usr = srp.User(uname, password)
-uname, A = usr.start_authentication()
+# uname, A = usr.start_authentication()
+
+AStr = input("A: ")
+A = bytes.fromhex(AStr)
 
 # The authentication process can fail at each step from this
 # point on. To comply with the SRP protocol, the authentication
@@ -48,14 +51,20 @@ uname, A = usr.start_authentication()
 svr = srp.Verifier(uname, salt, vkey, A)
 s, B = svr.get_challenge()
 
+print(B.hex())
+print(A.hex())
+
 if s is None or B is None:
     raise AuthenticationFailed()
 
 # Server => Client: s, B
-M = usr.process_challenge(s, B)
+MStr = input("M: ")
+M = bytes.fromhex(MStr)
 
 if M is None:
     raise AuthenticationFailed()
+
+print(M.hex())
 
 # Client => Server: M
 HAMK = svr.verify_session(M)
@@ -68,5 +77,5 @@ usr.verify_session(HAMK)
 
 # At this point the authentication process is complete.
 
-assert usr.authenticated()
+# assert usr.authenticated()
 assert svr.authenticated()
